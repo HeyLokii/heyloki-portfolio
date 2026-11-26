@@ -1,0 +1,14 @@
+const box=document.createElement('div');box.className='box';box.innerHTML='<button class="nav l" aria-label="previous">‹</button><img alt=""><p></p><button class="nav r" aria-label="next">›</button>';document.body.appendChild(box);
+let group=[],at=0;const show=k=>{at=(k+group.length)%group.length;const i=group[at];box.querySelector('img').src=i.dataset.full;box.querySelector('p').textContent=i.alt||'';box.classList.add('on')};
+box.onclick=e=>{if(e.target.classList.contains('nav'))return;box.classList.remove('on')};box.querySelector('.l').onclick=()=>show(at-1);box.querySelector('.r').onclick=()=>show(at+1);
+document.querySelectorAll('[data-full]').forEach(i=>i.onclick=()=>{group=[...document.querySelectorAll('[data-full][data-group="'+i.dataset.group+'"]')];show(group.indexOf(i))});
+document.addEventListener('keydown',e=>{if(!box.classList.contains('on'))return;if(e.key==='Escape')box.classList.remove('on');if(e.key==='ArrowLeft')show(at-1);if(e.key==='ArrowRight')show(at+1)});
+document.querySelectorAll('.carousel').forEach(c=>{const f=[...c.querySelectorAll('figure')],d=[...c.querySelectorAll('.dots span')],pb=c.querySelector('.pause');let i=0,paused=false;
+const img=k=>f[k].querySelector('img'),cv=k=>f[k].querySelector('canvas');
+const restart=k=>{const m=img(k);m.src=m.dataset.src+'?r='+Date.now()};
+const pause=()=>{const m=img(i),v=cv(i);v.width=m.naturalWidth;v.height=m.naturalHeight;v.getContext('2d').drawImage(m,0,0);v.hidden=false;paused=true;pb.textContent='Play'};
+const play=()=>{cv(i).hidden=true;paused=false;pb.textContent='Pause'};
+const go=k=>{f[i].classList.remove('on');d[i]&&d[i].classList.remove('on');cv(i).hidden=true;i=(k+f.length)%f.length;f[i].classList.add('on');d[i]&&d[i].classList.add('on');paused=false;pb.textContent='Pause';restart(i)};
+c.querySelector('.nav.l').onclick=()=>go(i-1);c.querySelector('.nav.r').onclick=()=>go(i+1);d.forEach((s,k)=>s.onclick=()=>go(k));
+pb.onclick=()=>paused?play():pause();c.querySelector('.again').onclick=()=>{play();restart(i)};
+document.addEventListener('keydown',e=>{if(box.classList.contains('on'))return;if(e.key==='ArrowLeft')go(i-1);if(e.key==='ArrowRight')go(i+1)})});
